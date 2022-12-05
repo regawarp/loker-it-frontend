@@ -5,9 +5,20 @@ export const TweetService = {
 };
 
 async function scheduleTweet(startDate, endDate) {
-  return new Promise((resolve) =>
-    setTimeout(resolve, 2000, {
-      data: "schedule tweet success",
-    })
-  );
+  const result = await axiosInstance
+    .post(
+      "/schedule-tweet",
+      {
+        startDate: startDate,
+        endDate: endDate,
+      },
+      {}
+    )
+    .then((res) => res)
+    .catch((e) => {
+      console.log(e);
+      return e;
+    });
+
+  return result;
 }

@@ -14,6 +14,9 @@ const ScheduleTweet = (props) => {
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
 
+  const [successCount, setSuccessCount] = useState(0);
+  const [lastPostedDate, setLastPostedDate] = useState(null);
+
   const toastId = "schedule-tweet-result";
   const messageSuccess = (message) =>
     toast.success(message, {
@@ -29,11 +32,17 @@ const ScheduleTweet = (props) => {
     if (startDate && endDate) {
       setLoadingScheduleTweet(true);
       const result = await TweetService.scheduleTweet(startDate, endDate);
-      if (result?.data === "schedule tweet success") {
-        messageSuccess(result?.data);
+      if (result?.data?.message === "schedule tweet success") {
+        messageSuccess(result?.data?.message);
       } else {
-        messageFailed(result?.data || result?.code);
+        messageFailed(result?.data?.message || result?.code);
       }
+      setSuccessCount(result?.data?.successCount || 0);
+      setLastPostedDate(
+        result?.data?.lastPostedDate
+          ? new Date(result?.data?.lastPostedDate)
+          : null
+      );
       setLoadingScheduleTweet(false);
     }
   };
@@ -98,6 +107,24 @@ const ScheduleTweet = (props) => {
               "Schedule Tweet"
             )}
           </div>
+        </div>
+        <div className="flex flex-col gap-4">
+          {lastPostedDate ? (
+            <span>
+              <span className="font-bold">Last posted date: </span>
+              {lastPostedDate?.toDateString()}
+            </span>
+          ) : (
+            <></>
+          )}
+          {successCount > 0 ? (
+            <span>
+              <span className="font-bold">Scheduled tweet success count: </span>
+              {successCount}
+            </span>
+          ) : (
+            <></>
+          )}
         </div>
       </div>
       <ToastContainer />
