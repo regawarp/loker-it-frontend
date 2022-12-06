@@ -2,7 +2,7 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { format, parseISO } from "date-fns";
+import { format } from "date-fns";
 
 import { useState } from "react";
 import { TweetService } from "../../services/TweetService";
