@@ -2,6 +2,7 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 
 import Main from "./components/Main";
 import Poster from "./components/Poster";
+import Caption from "./components/Caption";
 
 function App() {
   return (
@@ -9,6 +10,9 @@ function App() {
       <div className="App wrapper">
         <Routes>
           <Route element={<Main>test</Main>} path="/" />
+        </Routes>
+        <Routes>
+          <Route element={<Main><Caption /></Main>} path="/caption" />
         </Routes>
         <Routes>
           <Route
