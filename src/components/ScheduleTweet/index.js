@@ -2,6 +2,7 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { format, parseISO } from "date-fns";
 
 import { useState } from "react";
 import { TweetService } from "../../services/TweetService";
@@ -15,6 +16,7 @@ const ScheduleTweet = (props) => {
   const [endDate, setEndDate] = useState(null);
 
   const [successCount, setSuccessCount] = useState(0);
+  const [tweetsNeeded, setTweetsNeeded] = useState(0);
   const [lastPostedDate, setLastPostedDate] = useState(null);
 
   const toastId = "schedule-tweet-result";
@@ -38,6 +40,7 @@ const ScheduleTweet = (props) => {
         messageFailed(result?.data?.message || result?.code);
       }
       setSuccessCount(result?.data?.successCount || 0);
+      setTweetsNeeded(result?.data?.tweetsNeeded || 0);
       setLastPostedDate(
         result?.data?.lastPostedDate
           ? new Date(result?.data?.lastPostedDate)
@@ -112,15 +115,15 @@ const ScheduleTweet = (props) => {
           {lastPostedDate ? (
             <span>
               <span className="font-bold">Last posted date: </span>
-              {lastPostedDate?.toDateString()}
+              {format(lastPostedDate, "yyyy-MM-dd HH:mm")}
             </span>
           ) : (
             <></>
           )}
-          {successCount > 0 ? (
+          {tweetsNeeded > 0 ? (
             <span>
               <span className="font-bold">Scheduled tweet success count: </span>
-              {successCount}
+              {successCount}/{tweetsNeeded}
             </span>
           ) : (
             <></>
