@@ -6,7 +6,10 @@ import { useState, useEffect, useRef } from "react";
 import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
 
 import Modal from "../Modal";
+import { SelectionBox } from "../SelectionBox";
+
 import { PosterService } from "../../services/PosterService";
+import { CaptionService } from "../../services/CaptionService";
 
 const ModalSelectImage = ({ show, setShow, posterList, setPosterList }) => {
   const [loadingGetPoster, setLoadingGetPoster] = useState(false);
@@ -122,12 +125,33 @@ const PostTweet = (props) => {
     arrows: true,
   };
 
+  const [caption, setCaption] = useState(null);
+  const [captionsOptions, setCaptionsOptions] = useState([]);
+
+  async function getCaptions() {
+    const dataFromAPI = await CaptionService.getCaptions();
+    if (Array.isArray(dataFromAPI?.data)) {
+      setCaptionsOptions(
+        dataFromAPI?.data?.map((obj) => {
+          return {
+            label: obj?.caption_text,
+            value: obj?.caption_id,
+          };
+        })
+      );
+    }
+  }
+
+  useEffect(() => {
+    getCaptions();
+  }, []);
+
   return (
     <>
-      <div className="flex flex-row gap-4 px-6">
+      <div className="flex flex-row gap-4 px-6 mt-5">
         <div className="flex flex-col justify-center w-[48rem] h-full gap-8">
           {posterCarousels?.length > 0 ? (
-            <Slider {...settings} className="mt-5 bg-gray-300 py-4">
+            <Slider {...settings} className="bg-gray-300 py-4">
               {posterCarousels !== null && posterCarousels !== undefined ? (
                 posterCarousels.map((carousel, index) => {
                   return (
@@ -161,7 +185,7 @@ const PostTweet = (props) => {
             </Slider>
           ) : (
             <div
-              className="flex flex-col mt-5 h-[44rem] border-solid border-2 border-black 
+              className="flex flex-col h-[44rem] border-solid border-2 border-black 
               items-center justify-center font-bold text-lg"
             >
               Select poster first
@@ -171,9 +195,15 @@ const PostTweet = (props) => {
             select poster
           </div>
         </div>
-        <div className="flex flex-col gap-4">
-          <div>selection box</div>
-          <div>text preview</div>
+        <div className="flex flex-col gap-4 w-full">
+          <SelectionBox
+            label="Caption"
+            placeholder="Choose caption"
+            value={caption}
+            options={captionsOptions}
+            handleChange={(value) => setCaption(value)}
+          />
+          <div>{caption?.caption_text}</div>
         </div>
       </div>
       <ModalSelectImage
