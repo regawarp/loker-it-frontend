@@ -2,6 +2,7 @@ import axiosInstance from "./AxiosInstance";
 
 export const TweetService = {
   scheduleTweet,
+  postTweet,
 };
 
 async function scheduleTweet(startDate, endDate) {
@@ -19,6 +20,15 @@ async function scheduleTweet(startDate, endDate) {
       console.log(e);
       return e;
     });
+
+  return result;
+}
+
+async function postTweet(caption, images) {
+  const result = axiosInstance
+    .post('/tweets', { caption, images }, {})
+    .then((res) => res)
+    .catch((e) => console.log(e));
 
   return result;
 }

@@ -1,113 +1,31 @@
+import './index.css';
 import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
-
 import { useState, useEffect, useRef } from "react";
 import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
 import reactStringReplace from "react-string-replace";
-
-import Modal from "../Modal";
 import { SelectionBox } from "../SelectionBox";
-
-import { PosterService } from "../../services/PosterService";
-import { CaptionService } from "../../services/CaptionService";
-
-const ModalSelectImage = ({ show, setShow, posterList, setPosterList }) => {
-  const [loadingGetPoster, setLoadingGetPoster] = useState(false);
-  const [posters, setPosters] = useState([]);
-
-  useEffect(() => {
-    const getPoster = async () => {
-      setLoadingGetPoster(true);
-      const result = await PosterService.getPosters();
-      if (Array.isArray(result?.data)) {
-        setPosters(result?.data);
-      }
-      setLoadingGetPoster(false);
-    };
-    getPoster();
-  }, []);
-
-  return (
-    <Modal show={show} setShow={setShow}>
-      <Modal.Header>
-        <span className="text-xl font-bold leading-[1.0625rem]">
-          Select poster to be posted
-        </span>
-        <label
-          className="btn btn-xs btn-circle absolute bg-gray-500 right-6 top-7 pt-0.5"
-          onClick={() => setShow(false)}
-        >
-          ✕
-        </label>
-        <div className="divider"></div>
-      </Modal.Header>
-      <Modal.Body>
-        <div className="grid grid-cols-4 gap-4 w-[82rem] h-[38rem]">
-          {loadingGetPoster ? (
-            <>
-              <div className="w-[16rem] h-[16rem] bg-gray-300 animate-pulse"></div>
-              <div className="w-[16rem] h-[16rem] bg-gray-300 animate-pulse"></div>
-              <div className="w-[16rem] h-[16rem] bg-gray-300 animate-pulse"></div>
-              <div className="w-[16rem] h-[16rem] bg-gray-300 animate-pulse"></div>
-              <div className="w-[16rem] h-[16rem] bg-gray-300 animate-pulse"></div>
-              <div className="w-[16rem] h-[16rem] bg-gray-300 animate-pulse"></div>
-              <div className="w-[16rem] h-[16rem] bg-gray-300 animate-pulse"></div>
-            </>
-          ) : posters?.length > 0 ? (
-            posters?.map((poster, idx) => (
-              <div
-                key={idx}
-                className={`"flex flex-col w-full h-[18rem] gap-2 p-1 bg-gray-200 ${
-                  posterList.some((item) => poster?.filename === item?.filename)
-                    ? "bg-green-500"
-                    : "bg-gray-200"
-                }`}
-                onClick={() => {
-                  if (
-                    posterList.some(
-                      (item) => poster?.filename === item?.filename
-                    )
-                  ) {
-                    setPosterList((previousState) =>
-                      previousState.filter(
-                        (item) => poster?.filename !== item?.filename
-                      )
-                    );
-                  } else {
-                    if (posterList?.length < 4) {
-                      setPosterList((previousState) => [
-                        ...previousState,
-                        poster,
-                      ]);
-                    }
-                  }
-                }}
-              >
-                <img
-                  key={idx}
-                  src={poster?.url}
-                  alt={poster?.filename}
-                  className="w-full max-h-[16rem] cursor-pointer"
-                />
-                <span className="w-full text-center pt-1 pb-2 font-bold">
-                  {poster?.filename}
-                </span>
-              </div>
-            ))
-          ) : (
-            <div className="w-full text-center font-bold">No data</div>
-          )}
-        </div>
-      </Modal.Body>
-    </Modal>
-  );
-};
+import SelectImageModal from "./SelectImageModal";
+import { ToastContainer, toast } from 'react-toastify';
+import { CaptionService } from '../../services/CaptionService';
+import { TweetService } from '../../services/TweetService';
 
 const PostTweet = (props) => {
   const [carouselIndexActive, setCarouselIndexActive] = useState(0);
   const [showModalSelectImage, setShowModalSelectImage] = useState(false);
   const [posterCarousels, setPosterCarousels] = useState([]);
+  const toastId = "post-tweet-result";
+
+  const messageSuccess = (message) =>
+    toast.success(message, {
+      toastId: toastId,
+    });
+
+  const messageFailed = (message) =>
+    toast.error(message, {
+      toastId: toastId,
+    });
 
   const transformRef = useRef(null);
   useEffect(() => {
@@ -151,94 +69,116 @@ const PostTweet = (props) => {
   const [companyName, setCompanyName] = useState("");
   const [job, setJob] = useState("");
 
+  const posterCarouselComp = <div className="flex flex-col justify-between p-4 w-1/2 h-full gap-8">
+    {posterCarousels?.length > 0 ? (
+      <Slider {...settings} className="bg-gray-300 w-full h-[85%]">
+        {posterCarousels !== null && posterCarousels !== undefined ? (
+          posterCarousels.map((carousel, index) => {
+            return (
+              <div
+                key={`slide` + index}
+                className={`${carouselIndexActive === index
+                  ? "carousel-item"
+                  : "hidden"
+                  } relative w-full h-full`}
+              >
+                <TransformWrapper initialScale={1} ref={transformRef}>
+                  {({ zoomIn, zoomOut, resetTransform, ...rest }) => (
+                    <div className="flex flex-col w-full items-center h-full">
+                      <TransformComponent>
+                        <img
+                          src={carousel?.url}
+                          alt={carousel?.filename}
+                          className="h-full m-0"
+                        />
+                      </TransformComponent>
+                    </div>
+                  )}
+                </TransformWrapper>
+              </div>
+            );
+          })
+        ) : (
+          <></>
+        )}
+      </Slider>
+    ) : (
+      <div
+        className="flex flex-col h-[85%] w-full border-solid border-2 border-black 
+          items-center justify-center font-bold text-lg"
+      >
+        Select poster first
+      </div>
+    )}
+    <div className="btn h-[5%]" onClick={() => setShowModalSelectImage(true)}>
+      select poster
+    </div>
+  </div>
+
+  const captionSelectComp = <div className="flex flex-col w-1/2 h-full p-4 gap-4">
+    <SelectionBox
+      label="Caption"
+      placeholder="Choose caption"
+      value={caption}
+      options={captionsOptions}
+      handleChange={(value) => setCaption(value)}
+    />
+    <div className='leading-[3]'>
+      {reactStringReplace(caption?.label, /\[([^\]]*)\]/g, (match, i) => (
+        <span
+          key={i}
+          className="border border-solid rounded-lg px-2 py-1"
+        >
+          <input
+            type="text"
+            name="q"
+            placeholder={match}
+            autoComplete="off"
+            className="focus:outline-none h-6"
+            value={match === COMPANY_NAME_STRING ? companyName : job}
+            onChange={(e) => {
+              e.preventDefault();
+              if (match === COMPANY_NAME_STRING) {
+                setCompanyName(e.target.value);
+              } else {
+                setJob(e.target.value);
+              }
+            }}
+          />
+        </span>
+      ))}
+    </div>
+    <div className="flex items-end justify-end">
+      <div className="btn"
+        onClick={async () => {
+          const postCaption = caption.label
+            .replace(/\[nama perusahaan\]/gi, companyName)
+            .replace(/\[pekerjaan\]/gi, job);
+          const postImages = posterCarousels.map(item => item.url);
+
+          const result = await TweetService.postTweet(postCaption, postImages);
+          if (result?.data === "success!") {
+            setCaption(null);
+            setPosterCarousels([]);
+            messageSuccess(result?.data);
+          } else {
+            messageFailed(result?.data);
+          }
+        }}
+      >
+        Post Tweet
+      </div>
+    </div>
+  </div>
+
   return (
     <>
-      <div className="flex flex-row gap-4 px-6 mt-5">
-        <div className="flex flex-col justify-center w-[48rem] h-full gap-8">
-          {posterCarousels?.length > 0 ? (
-            <Slider {...settings} className="bg-gray-300 py-4 w-[44rem]">
-              {posterCarousels !== null && posterCarousels !== undefined ? (
-                posterCarousels.map((carousel, index) => {
-                  return (
-                    <div
-                      key={`slide` + index}
-                      className={`${
-                        carouselIndexActive === index
-                          ? "carousel-item"
-                          : "hidden"
-                      } relative w-full`}
-                    >
-                      <TransformWrapper initialScale={1} ref={transformRef}>
-                        {({ zoomIn, zoomOut, resetTransform, ...rest }) => (
-                          <div className="flex flex-col w-full items-center">
-                            <TransformComponent>
-                              <img
-                                src={carousel?.url}
-                                alt={carousel?.filename}
-                                className="h-[42rem] m-0"
-                              />
-                            </TransformComponent>
-                          </div>
-                        )}
-                      </TransformWrapper>
-                    </div>
-                  );
-                })
-              ) : (
-                <></>
-              )}
-            </Slider>
-          ) : (
-            <div
-              className="flex flex-col h-[44rem] w-[44rem] border-solid border-2 border-black 
-              items-center justify-center font-bold text-lg"
-            >
-              Select poster first
-            </div>
-          )}
-          <div className="btn" onClick={() => setShowModalSelectImage(true)}>
-            select poster
-          </div>
-        </div>
-        <div className="flex flex-col gap-10 w-full">
-          <SelectionBox
-            label="Caption"
-            placeholder="Choose caption"
-            value={caption}
-            options={captionsOptions}
-            handleChange={(value) => setCaption(value)}
-          />
-          <div>
-            {reactStringReplace(caption?.label, /\[([^\]]*)\]/g, (match, i) => (
-              <span
-                key={i}
-                className="border border-solid rounded-lg px-2 py-1"
-              >
-                <input
-                  type="text"
-                  name="q"
-                  placeholder={match}
-                  autoComplete="off"
-                  className="focus:outline-none"
-                  value={match === COMPANY_NAME_STRING ? companyName : job}
-                  onChange={(e) => {
-                    e.preventDefault();
-                    if (match === COMPANY_NAME_STRING) {
-                      setCompanyName(e.target.value);
-                    } else {
-                      setJob(e.target.value);
-                    }
-                  }}
-                />
-              </span>
-            ))}
-          </div>
-          <div className="flex items-end justify-end">
-            <div className="btn">Post Tweet</div>
-          </div>
-        </div>
+      <ToastContainer />
+      <div className="flex flex-row p-0 m-0 w-screen h-screen">
+        {posterCarouselComp}
+        {captionSelectComp}
       </div>
-      <ModalSelectImage
+      <SelectImageModal
         show={showModalSelectImage}
         setShow={setShowModalSelectImage}
         posterList={posterCarousels}
