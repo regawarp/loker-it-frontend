@@ -30,14 +30,14 @@ const customStylesSingle = {
       ...base["@media (max-width: 1024px)"],
       height: 32,
       minHeight: 32,
-      fontSize: "10px",
+      fontSize: "16px",
     },
   }),
   placeholder: (base) => ({
     ...base,
     "@media (max-width: 1024px)": {
       ...base["@media (max-width: 1024px)"],
-      fontSize: "10px",
+      fontSize: "16px",
     },
   }),
   menu: (base) => ({
@@ -54,7 +54,7 @@ const customStylesSingle = {
     zIndex: 9999,
     "@media (max-width: 1024px)": {
       ...base["@media (max-width: 1024px)"],
-      fontSize: "10px",
+      fontSize: "16px",
     },
   }),
   menuList: (base) => ({
@@ -66,7 +66,7 @@ const customStylesSingle = {
   singleValue: (provided, state) => ({
     ...provided,
     color: "#4a318f",
-    fontSize: "12px",
+    fontSize: "16px",
     "@media (max-width: 1024px)": {
       ...provided["@media (max-width: 1024px)"],
       fontSize: "10px",
@@ -106,12 +106,12 @@ export const SelectionBox = ({
 }) => (
   <div className="w-full flex flex-col gap-1">
     <div className="w-full flex flex-col gap-2">
-      <label className="text-xs font-bold text-[#000000]">
+      <label className="font-bold text-[#000000]">
         {label}
       </label>
       <Select
         placeholder={
-          <div className="placeholder-gray-500 text-xs">
+          <div className="placeholder-gray-500">
             {placeholder}
           </div>
         }
@@ -123,7 +123,7 @@ export const SelectionBox = ({
         isClearable={isClearable}
       />
     </div>
-    <div className={`${!error ? "hidden" : ""}text-red-500 text-xs`}>
+    <div className={`${!error ? "hidden" : ""}text-red-500`}>
       {error ? error : null}
     </div>
   </div>

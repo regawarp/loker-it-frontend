@@ -4,6 +4,7 @@ import "slick-carousel/slick/slick-theme.css";
 
 import { useState, useEffect, useRef } from "react";
 import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
+import reactStringReplace from "react-string-replace";
 
 import Modal from "../Modal";
 import { SelectionBox } from "../SelectionBox";
@@ -146,12 +147,16 @@ const PostTweet = (props) => {
     getCaptions();
   }, []);
 
+  const COMPANY_NAME_STRING = "Nama Perusahaan";
+  const [companyName, setCompanyName] = useState("");
+  const [job, setJob] = useState("");
+
   return (
     <>
       <div className="flex flex-row gap-4 px-6 mt-5">
         <div className="flex flex-col justify-center w-[48rem] h-full gap-8">
           {posterCarousels?.length > 0 ? (
-            <Slider {...settings} className="bg-gray-300 py-4">
+            <Slider {...settings} className="bg-gray-300 py-4 w-[44rem]">
               {posterCarousels !== null && posterCarousels !== undefined ? (
                 posterCarousels.map((carousel, index) => {
                   return (
@@ -185,7 +190,7 @@ const PostTweet = (props) => {
             </Slider>
           ) : (
             <div
-              className="flex flex-col h-[44rem] border-solid border-2 border-black 
+              className="flex flex-col h-[44rem] w-[44rem] border-solid border-2 border-black 
               items-center justify-center font-bold text-lg"
             >
               Select poster first
@@ -195,7 +200,7 @@ const PostTweet = (props) => {
             select poster
           </div>
         </div>
-        <div className="flex flex-col gap-4 w-full">
+        <div className="flex flex-col gap-10 w-full">
           <SelectionBox
             label="Caption"
             placeholder="Choose caption"
@@ -203,7 +208,34 @@ const PostTweet = (props) => {
             options={captionsOptions}
             handleChange={(value) => setCaption(value)}
           />
-          <div>{caption?.caption_text}</div>
+          <div>
+            {reactStringReplace(caption?.label, /\[([^\]]*)\]/g, (match, i) => (
+              <span
+                key={i}
+                className="border border-solid rounded-lg px-2 py-1"
+              >
+                <input
+                  type="text"
+                  name="q"
+                  placeholder={match}
+                  autoComplete="off"
+                  className="focus:outline-none"
+                  value={match === COMPANY_NAME_STRING ? companyName : job}
+                  onChange={(e) => {
+                    e.preventDefault();
+                    if (match === COMPANY_NAME_STRING) {
+                      setCompanyName(e.target.value);
+                    } else {
+                      setJob(e.target.value);
+                    }
+                  }}
+                />
+              </span>
+            ))}
+          </div>
+          <div className="flex items-end justify-end">
+            <div className="btn">Post Tweet</div>
+          </div>
         </div>
       </div>
       <ModalSelectImage
