@@ -2,6 +2,7 @@ import axiosInstance from "./AxiosInstance";
 
 export const TweetService = {
   scheduleTweet,
+  getScheduledTweets,
   postTweet,
 };
 
@@ -24,9 +25,21 @@ async function scheduleTweet(startDate, endDate) {
   return result;
 }
 
+async function getScheduledTweets() {
+  const result = await axiosInstance
+    .get("/schedule-tweet")
+    .then((res) => res)
+    .catch((e) => {
+      console.log(e);
+      return e;
+    });
+
+  return result;
+}
+
 async function postTweet(caption, images) {
   const result = axiosInstance
-    .post('/tweets', { caption, images }, {})
+    .post("/tweets", { caption, images }, {})
     .then((res) => res)
     .catch((e) => console.log(e));
 

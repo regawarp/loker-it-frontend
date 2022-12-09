@@ -5,9 +5,12 @@ import "react-toastify/dist/ReactToastify.css";
 import { format } from "date-fns";
 
 import { useState } from "react";
-import { TweetService } from "../../services/TweetService";
 
 import { ImSpinner2 } from "react-icons/im";
+
+import ScheduledTweetList from "./ScheduledTweetList";
+import { TweetService } from "../../services/TweetService";
+
 
 const ScheduleTweet = (props) => {
   const [loadingScheduleTweet, setLoadingScheduleTweet] = useState(false);
@@ -129,6 +132,7 @@ const ScheduleTweet = (props) => {
             <></>
           )}
         </div>
+        <ScheduledTweetList />
       </div>
       <ToastContainer />
     </>
