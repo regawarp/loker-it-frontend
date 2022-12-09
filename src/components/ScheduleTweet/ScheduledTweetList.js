@@ -3,19 +3,27 @@ import { format } from "date-fns";
 
 import { TweetService } from "../../services/TweetService";
 
-const ScheduledTweetList = (props) => {
+const ScheduledTweetList = ({ refresh, setRefresh }) => {
   const [scheduledTweets, setScheduledTweets] = useState([]);
   const BASE_URL = process.env.REACT_APP_BE_URL;
 
+  const getScheduledTweets = async () => {
+    const result = await TweetService.getScheduledTweets();
+    if (Array.isArray(result?.data)) {
+      setScheduledTweets(result?.data);
+    }
+  };
+
   useEffect(() => {
-    const getScheduledTweets = async () => {
-      const result = await TweetService.getScheduledTweets();
-      if (Array.isArray(result?.data)) {
-        setScheduledTweets(result?.data);
-      }
-    };
     getScheduledTweets();
   }, []);
+
+  useEffect(() => {
+    if (refresh) {
+      getScheduledTweets();
+      setRefresh(false);
+    }
+  }, [refresh]);
 
   return (
     <>
