@@ -4,8 +4,9 @@ import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import { useState, useEffect, useRef } from "react";
 import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
+import { ImSpinner2 } from "react-icons/im";
 import SelectImageModal from "./SelectImageModal";
-import { ToastContainer, toast } from "react-toastify";
+import { toast } from "react-toastify";
 import { TweetService } from "../../services/TweetService";
 import { useFormik } from "formik";
 
@@ -18,6 +19,8 @@ const UpdateTweetModal = ({ show, setShow, selectedTweet }) => {
     selectedTweet?.tweet_posters || []
   );
   const toastId = "post-tweet-result";
+
+  const [loadingUpdate, setLoadingUpdate] = useState(false);
 
   const messageSuccess = (message) =>
     toast.success(message, {
@@ -54,13 +57,26 @@ const UpdateTweetModal = ({ show, setShow, selectedTweet }) => {
       tweet_posters: [],
     },
     onSubmit: async (values) => {
-      console.log("submitting:", {
+      setLoadingUpdate(true);
+      const result = await TweetService.updateScheduledTweet({
         id: values?.tweet_id,
         caption: values?.tweet_caption_text,
         posterIds: values?.tweet_posters?.map((poster) => poster?.poster_id),
       });
+      if (result?.data === "update tweet success") {
+        messageSuccess(result?.data);
+      } else {
+        messageFailed(result?.data);
+      }
+      setLoadingUpdate(false);
     },
   });
+
+  useEffect(() => {
+    if (!show) {
+      formik.resetForm();
+    }
+  }, [show]);
 
   useEffect(() => {
     formik.setFieldValue("tweet_posters", posterCarousels);
@@ -133,8 +149,15 @@ const UpdateTweetModal = ({ show, setShow, selectedTweet }) => {
         ></textarea>
       </div>
       <div className="flex items-end justify-end">
-        <button type="submit" className="btn">
-          Update Tweet
+        <button
+          type="submit"
+          className={`btn w-[10rem] ${loadingUpdate ? "btn-disabled" : ""}`}
+        >
+          {loadingUpdate ? (
+            <ImSpinner2 className="animate-spin" />
+          ) : (
+            "Update Tweet"
+          )}
         </button>
       </div>
     </div>
@@ -170,7 +193,6 @@ const UpdateTweetModal = ({ show, setShow, selectedTweet }) => {
 
   return (
     <>
-      <ToastContainer />
       <Modal show={show} setShow={setShow}>
         {modalHeader}
         {modalBody}

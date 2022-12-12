@@ -40,7 +40,7 @@ async function getScheduledTweets() {
 
 async function updateScheduledTweet(tweet) {
   const result = axiosInstance
-    .put("/schedule-tweet", { tweet }, {})
+    .put("/schedule-tweet", tweet, {})
     .then((res) => res)
     .catch((e) => console.log(e));
 
