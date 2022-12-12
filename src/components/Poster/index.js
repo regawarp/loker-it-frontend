@@ -82,18 +82,27 @@ const Poster = (props) => {
   const [loadingDownloadPoster, setLoadingDownloadPoster] = useState(false);
 
   const [posters, setPosters] = useState([]);
+  const [refreshPoster, setRefreshPoster] = useState(false);
+
+  const getPoster = async () => {
+    setLoadingGetPoster(true);
+    const result = await PosterService.getPosters();
+    if (Array.isArray(result?.data)) {
+      setPosters(result?.data);
+    }
+    setLoadingGetPoster(false);
+  };
 
   useEffect(() => {
-    const getPoster = async () => {
-      setLoadingGetPoster(true);
-      const result = await PosterService.getPosters();
-      if (Array.isArray(result?.data)) {
-        setPosters(result?.data);
-      }
-      setLoadingGetPoster(false);
-    };
     getPoster();
   }, []);
+
+  useEffect(() => {
+    if (refreshPoster) {
+      getPoster();
+      setRefreshPoster(false);
+    }
+  }, [refreshPoster]);
 
   const [showModalPoster, setShowModalPoster] = useState(false);
   const [openedPoster, setOpenedPoster] = useState("");
@@ -118,6 +127,7 @@ const Poster = (props) => {
       const result = await PosterService.downloadPoster(startDate, endDate);
       if (result?.data === "download poster success") {
         messageSuccess(result?.data);
+        setRefreshPoster(true);
       } else {
         messageFailed(result?.data || result?.code);
       }

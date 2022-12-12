@@ -5,9 +5,11 @@ import "react-toastify/dist/ReactToastify.css";
 import { format } from "date-fns";
 
 import { useState } from "react";
-import { TweetService } from "../../services/TweetService";
 
 import { ImSpinner2 } from "react-icons/im";
+
+import ScheduledTweetList from "./ScheduledTweetList";
+import { TweetService } from "../../services/TweetService";
 
 const ScheduleTweet = (props) => {
   const [loadingScheduleTweet, setLoadingScheduleTweet] = useState(false);
@@ -18,6 +20,8 @@ const ScheduleTweet = (props) => {
   const [successCount, setSuccessCount] = useState(0);
   const [tweetsNeeded, setTweetsNeeded] = useState(0);
   const [lastPostedDate, setLastPostedDate] = useState(null);
+
+  const [refreshScheduledTweets, setRefreshScheduledTweets] = useState(false);
 
   const toastId = "schedule-tweet-result";
   const messageSuccess = (message) =>
@@ -36,6 +40,7 @@ const ScheduleTweet = (props) => {
       const result = await TweetService.scheduleTweet(startDate, endDate);
       if (result?.data?.message === "schedule tweet success") {
         messageSuccess(result?.data?.message);
+        setRefreshScheduledTweets(true);
       } else {
         messageFailed(result?.data?.message || result?.code);
       }
@@ -129,6 +134,10 @@ const ScheduleTweet = (props) => {
             <></>
           )}
         </div>
+        <ScheduledTweetList
+          refresh={refreshScheduledTweets}
+          setRefresh={setRefreshScheduledTweets}
+        />
       </div>
       <ToastContainer />
     </>
