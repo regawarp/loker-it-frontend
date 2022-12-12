@@ -1,11 +1,16 @@
 import { useState, useEffect } from "react";
 import { format } from "date-fns";
 
+import UpdateTweetModal from "./UpdateTweetModal";
+
 import { TweetService } from "../../services/TweetService";
 
 const ScheduledTweetList = ({ refresh, setRefresh }) => {
   const [scheduledTweets, setScheduledTweets] = useState([]);
   const BASE_URL = process.env.REACT_APP_BE_URL;
+
+  const [selectedTweet, setSelectedTweet] = useState(null);
+  const [showUpdateModal, setShowUpdateModal] = useState(false);
 
   const getScheduledTweets = async () => {
     const result = await TweetService.getScheduledTweets();
@@ -44,14 +49,23 @@ const ScheduledTweetList = ({ refresh, setRefresh }) => {
                 <span className="bg-gray-200 px-4 text-center">
                   {format(date, "HH:mm:ss")}
                 </span>
+                <div
+                  className="btn"
+                  onClick={() => {
+                    setSelectedTweet(tweet);
+                    setShowUpdateModal(true);
+                  }}
+                >
+                  Update
+                </div>
               </div>
               <div className="flex flex-col gap-2 w-full">
                 <span className="font-bold">Poster</span>
                 <div className="grid grid-cols-4 w-full justify-between bg-gray-200 p-4 h-full">
-                  {tweet?.tweet_poster_image_paths?.map((path, idx) => (
+                  {tweet?.tweet_posters?.map((poster, idx) => (
                     <img
                       key={tweet.tweet_id + idx}
-                      src={BASE_URL + path}
+                      src={BASE_URL + poster?.poster_image_path}
                       alt={tweet.tweet_id + idx}
                       className="w-[10rem] h-[10rem]"
                     />
@@ -68,6 +82,11 @@ const ScheduledTweetList = ({ refresh, setRefresh }) => {
           );
         })}
       </div>
+      <UpdateTweetModal
+        show={showUpdateModal}
+        setShow={setShowUpdateModal}
+        selectedTweet={selectedTweet}
+      />
     </>
   );
 };

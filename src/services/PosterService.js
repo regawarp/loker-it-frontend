@@ -2,12 +2,22 @@ import axiosInstance from "./AxiosInstance";
 
 export const PosterService = {
   getPosters,
+  getPostersFromDB,
   downloadPoster,
 };
 
 async function getPosters() {
   const result = await axiosInstance
     .get("/poster")
+    .then((res) => res)
+    .catch((e) => console.log(e));
+
+  return result;
+}
+
+async function getPostersFromDB() {
+  const result = await axiosInstance
+    .get("/poster/db")
     .then((res) => res)
     .catch((e) => console.log(e));
 
