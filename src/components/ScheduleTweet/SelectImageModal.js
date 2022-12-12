@@ -21,12 +21,6 @@ const SelectImageModal = ({
       setLoadingGetPoster(true);
       const result = await PosterService.getPostersFromDB();
       if (Array.isArray(result?.data)) {
-        setPosters(
-          result?.data?.map((data) => ({
-            ...data,
-            url: process.env.REACT_APP_BE_URL + data?.poster_image_path,
-          }))
-        );
         setPostersFromDB(
           result?.data?.map((data) => ({
             ...data,
@@ -36,8 +30,10 @@ const SelectImageModal = ({
       }
       setLoadingGetPoster(false);
     };
-    getPoster();
-  }, []);
+    if (show) {
+      getPoster();
+    }
+  }, [show]);
 
   useEffect(() => {
     if (initialPosterList && initialPosterList?.length > 0) {
@@ -46,7 +42,7 @@ const SelectImageModal = ({
         url: process.env.REACT_APP_BE_URL + poster?.poster_image_path
       })), ...postersFromDB]);
     }
-  }, [initialPosterList]);
+  }, [initialPosterList, postersFromDB]);
 
   const modalHeader = (
     <Modal.Header>

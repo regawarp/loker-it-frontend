@@ -12,13 +12,18 @@ import { useFormik } from "formik";
 
 import Modal from "../Modal";
 
-const UpdateTweetModal = ({ show, setShow, selectedTweet }) => {
+const UpdateTweetModal = ({
+  show,
+  setShow,
+  selectedTweet,
+  setRefreshScheduledTweets,
+}) => {
   const [carouselIndexActive, setCarouselIndexActive] = useState(0);
   const [showModalSelectImage, setShowModalSelectImage] = useState(false);
   const [posterCarousels, setPosterCarousels] = useState(
     selectedTweet?.tweet_posters || []
   );
-  const toastId = "post-tweet-result";
+  const toastId = "update-tweet-result";
 
   const [loadingUpdate, setLoadingUpdate] = useState(false);
 
@@ -65,6 +70,8 @@ const UpdateTweetModal = ({ show, setShow, selectedTweet }) => {
       });
       if (result?.data === "update tweet success") {
         messageSuccess(result?.data);
+        setShow(false);
+        setRefreshScheduledTweets(true);
       } else {
         messageFailed(result?.data);
       }

@@ -21,8 +21,10 @@ const SelectImageModal = ({ show, setShow, posterList, setPosterList }) => {
       }
       setLoadingGetPoster(false);
     };
-    getPoster();
-  }, []);
+    if (show) {
+      getPoster();
+    }
+  }, [show]);
 
   const modalHeader = <Modal.Header>
     <span className="text-xl font-bold leading-[1.0625rem]">
