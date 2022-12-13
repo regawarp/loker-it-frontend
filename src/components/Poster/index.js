@@ -63,7 +63,7 @@ const ModalOpenImage = ({ show, setShow, openedPoster }) => {
               <div className="border-2 border-solid border-gray-200">
                 <TransformComponent>
                   <img
-                    src={openedPoster?.url}
+                    src={process.env.REACT_APP_BE_URL + openedPoster?.url}
                     alt="opened poster"
                     className="w-full max-w-[36rem]"
                   />
@@ -218,7 +218,7 @@ const Poster = (props) => {
               >
                 <img
                   key={idx}
-                  src={poster?.url}
+                  src={process.env.REACT_APP_BE_URL + poster?.url}
                   alt={poster?.filename}
                   className="w-full max-h-[24rem] cursor-pointer"
                   onClick={() => {
