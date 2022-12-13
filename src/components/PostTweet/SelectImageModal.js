@@ -14,12 +14,17 @@ const SelectImageModal = ({ show, setShow, posterList, setPosterList }) => {
       setLoadingGetPoster(true);
       const result = await PosterService.getPosters();
       if (Array.isArray(result?.data)) {
-        setPosters(result?.data);
+        setPosters(result?.data?.map((data) => ({
+          ...data,
+          url: process.env.REACT_APP_BE_URL + data?.url,
+        })));
       }
       setLoadingGetPoster(false);
     };
-    getPoster();
-  }, []);
+    if (show) {
+      getPoster();
+    }
+  }, [show]);
 
   const modalHeader = <Modal.Header>
     <span className="text-xl font-bold leading-[1.0625rem]">

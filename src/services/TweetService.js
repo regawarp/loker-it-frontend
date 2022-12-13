@@ -3,6 +3,8 @@ import axiosInstance from "./AxiosInstance";
 export const TweetService = {
   scheduleTweet,
   getScheduledTweets,
+  updateScheduledTweet,
+  deleteScheduledTweet,
   postTweet,
 };
 
@@ -33,6 +35,24 @@ async function getScheduledTweets() {
       console.log(e);
       return e;
     });
+
+  return result;
+}
+
+async function updateScheduledTweet(tweet) {
+  const result = axiosInstance
+    .put("/schedule-tweet", tweet, {})
+    .then((res) => res)
+    .catch((e) => console.log(e));
+
+  return result;
+}
+
+async function deleteScheduledTweet(id) {
+  const result = axiosInstance
+    .delete("/schedule-tweet", { data: { id: id } }, {})
+    .then((res) => res)
+    .catch((e) => console.log(e));
 
   return result;
 }
